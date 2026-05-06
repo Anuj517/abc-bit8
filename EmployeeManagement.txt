@@ -1,0 +1,311 @@
+import java.sql.*;
+import java.util.Scanner;
+
+public class EmployeeManagement {
+
+    static final String URL = "jdbc:mysql://localhost:3306/company_db";
+    static final String USER = "root";
+    static final String PASS = "password";
+
+    static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(URL, USER, PASS);
+    }
+
+    static void addEmployee(int id, String name, String dept, double salary) {
+        String sql = "INSERT INTO employees(emp_id,name,department,salary) VALUES(?,?,?,?)";
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            ps.setString(2, name);
+            ps.setString(3, dept);
+            ps.setDouble(4, salary);
+
+            System.out.println(ps.executeUpdate() > 0 ? "Employee added." : "Failed.");
+
+        } catch (SQLIntegrityConstraintViolationException e) {
+            System.out.println("Error: Employee ID " + id + " already exists.");
+        } catch (SQLException e) {
+            System.out.println("DB Error: " + e.getMessage());
+        }
+    }
+
+    static void viewEmployees() {
+        String sql = "SELECT * FROM employees ORDER BY emp_id";
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            System.out.println("-".repeat(55));
+            System.out.printf("%-8s %-18s %-14s %s%n", "EMP_ID", "NAME", "DEPARTMENT", "SALARY");
+            System.out.println("-".repeat(55));
+
+            boolean found = false;
+
+            while (rs.next()) {
+                found = true;
+                System.out.printf("%-8d %-18s %-14s %.2f%n",
+                        rs.getInt("emp_id"),
+                        rs.getString("name"),
+                        rs.getString("department"),
+                        rs.getDouble("salary"));
+            }
+
+            if (!found) System.out.println("No records found.");
+            System.out.println("-".repeat(55));
+
+        } catch (SQLException e) {
+            System.out.println("DB Error: " + e.getMessage());
+        }
+    }
+
+    static void updateSalary(int id, double sal) {
+        String sql = "UPDATE employees SET salary=? WHERE emp_id=?";
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setDouble(1, sal);
+            ps.setInt(2, id);
+
+            System.out.println(ps.executeUpdate() > 0 ?
+                    "Salary updated." : "ID " + id + " not found.");
+
+        } catch (SQLException e) {
+            System.out.println("DB Error: " + e.getMessage());
+        }
+    }
+
+    static void deleteEmployee(int id) {
+        String sql = "DELETE FROM employees WHERE emp_id=?";
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+
+            System.out.println(ps.executeUpdate() > 0 ?
+                    "Employee deleted." : "ID " + id + " not found.");
+
+        } catch (SQLException e) {
+            System.out.println("DB Error: " + e.getMessage());
+        }
+    }
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+        int choice;
+
+        do {
+            System.out.println("\n=== Employee Management System ===");
+            System.out.println("1. Add  2. View  3. Update  4. Delete  5. Exit");
+            System.out.print("Enter choice: ");
+            choice = sc.nextInt();
+
+            switch (choice) {
+
+                case 1:
+                    System.out.print("ID: ");
+                    int id = sc.nextInt();
+                    sc.nextLine();
+
+                    System.out.print("Name: ");
+                    String nm = sc.nextLine();
+
+                    System.out.print("Dept: ");
+                    String dp = sc.nextLine();
+
+                    System.out.print("Salary: ");
+                    double sal = sc.nextDouble();
+
+                    addEmployee(id, nm, dp, sal);
+                    break;
+
+                case 2:
+                    viewEmployees();
+                    break;
+
+                case 3:
+                    System.out.print("ID: ");
+                    int uid = sc.nextInt();
+
+                    System.out.print("New Salary: ");
+                    double newSal = sc.nextDouble();
+
+                    updateSalary(uid, newSal);
+                    break;
+
+                case 4:
+                    System.out.print("ID: ");
+                    int did = sc.nextInt();
+
+                    deleteEmployee(did);
+                    break;
+
+                case 5:
+                    System.out.println("Exiting. Goodbye!");
+                    break;
+
+                default:
+                    System.out.println("Invalid choice.");
+            }
+
+        } while (choice != 5);
+
+        sc.close();
+    }
+}import java.sql.*;
+import java.util.Scanner;
+
+public class EmployeeManagement {
+
+    static final String URL = "jdbc:mysql://localhost:3306/company_db";
+    static final String USER = "root";
+    static final String PASS = "password";
+
+    static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(URL, USER, PASS);
+    }
+
+    static void addEmployee(int id, String name, String dept, double salary) {
+        String sql = "INSERT INTO employees(emp_id,name,department,salary) VALUES(?,?,?,?)";
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            ps.setString(2, name);
+            ps.setString(3, dept);
+            ps.setDouble(4, salary);
+
+            System.out.println(ps.executeUpdate() > 0 ? "Employee added." : "Failed.");
+
+        } catch (SQLIntegrityConstraintViolationException e) {
+            System.out.println("Error: Employee ID " + id + " already exists.");
+        } catch (SQLException e) {
+            System.out.println("DB Error: " + e.getMessage());
+        }
+    }
+
+    static void viewEmployees() {
+        String sql = "SELECT * FROM employees ORDER BY emp_id";
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            System.out.println("-".repeat(55));
+            System.out.printf("%-8s %-18s %-14s %s%n", "EMP_ID", "NAME", "DEPARTMENT", "SALARY");
+            System.out.println("-".repeat(55));
+
+            boolean found = false;
+
+            while (rs.next()) {
+                found = true;
+                System.out.printf("%-8d %-18s %-14s %.2f%n",
+                        rs.getInt("emp_id"),
+                        rs.getString("name"),
+                        rs.getString("department"),
+                        rs.getDouble("salary"));
+            }
+
+            if (!found) System.out.println("No records found.");
+            System.out.println("-".repeat(55));
+
+        } catch (SQLException e) {
+            System.out.println("DB Error: " + e.getMessage());
+        }
+    }
+
+    static void updateSalary(int id, double sal) {
+        String sql = "UPDATE employees SET salary=? WHERE emp_id=?";
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setDouble(1, sal);
+            ps.setInt(2, id);
+
+            System.out.println(ps.executeUpdate() > 0 ?
+                    "Salary updated." : "ID " + id + " not found.");
+
+        } catch (SQLException e) {
+            System.out.println("DB Error: " + e.getMessage());
+        }
+    }
+
+    static void deleteEmployee(int id) {
+        String sql = "DELETE FROM employees WHERE emp_id=?";
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+
+            System.out.println(ps.executeUpdate() > 0 ?
+                    "Employee deleted." : "ID " + id + " not found.");
+
+        } catch (SQLException e) {
+            System.out.println("DB Error: " + e.getMessage());
+        }
+    }
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+        int choice;
+
+        do {
+            System.out.println("\n=== Employee Management System ===");
+            System.out.println("1. Add  2. View  3. Update  4. Delete  5. Exit");
+            System.out.print("Enter choice: ");
+            choice = sc.nextInt();
+
+            switch (choice) {
+
+                case 1:
+                    System.out.print("ID: ");
+                    int id = sc.nextInt();
+                    sc.nextLine();
+
+                    System.out.print("Name: ");
+                    String nm = sc.nextLine();
+
+                    System.out.print("Dept: ");
+                    String dp = sc.nextLine();
+
+                    System.out.print("Salary: ");
+                    double sal = sc.nextDouble();
+
+                    addEmployee(id, nm, dp, sal);
+                    break;
+
+                case 2:
+                    viewEmployees();
+                    break;
+
+                case 3:
+                    System.out.print("ID: ");
+                    int uid = sc.nextInt();
+
+                    System.out.print("New Salary: ");
+                    double newSal = sc.nextDouble();
+
+                    updateSalary(uid, newSal);
+                    break;
+
+                case 4:
+                    System.out.print("ID: ");
+                    int did = sc.nextInt();
+
+                    deleteEmployee(did);
+                    break;
+
+                case 5:
+                    System.out.println("Exiting. Goodbye!");
+                    break;
+
+                default:
+                    System.out.println("Invalid choice.");
+            }
+
+        } while (choice != 5);
+
+        sc.close();
+    }
+}
